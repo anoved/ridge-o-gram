@@ -105,23 +105,23 @@ int MergeImages(void) {
 			
 			if (on1 && on2) {
 				// both on
-				face(mOn, x, y, WEST);
-				face(mOn, x, y, EAST);
+				face(mOn, x, h - y, WEST);
+				face(mOn, x, h - y, EAST);
 			}
 			else if (!on1 && !on2) {
 				// both off
-				face(mOff, x, y, WEST);
-				face(mOff, x, y, EAST);
+				face(mOff, x, h - y, WEST);
+				face(mOff, x, h - y, EAST);
 			}
 			else if (on1 && !on2) {
 				// west on, east off
-				face(mOn, x, y, WEST);
-				face(mOff, x, y, EAST);
+				face(mOn, x, h - y, WEST);
+				face(mOff, x, h - y, EAST);
 			}
 			else if (!on1 && on2) {
 				// west off, east on
-				face(mOff, x, y, WEST);
-				face(mOn, x, y, EAST);
+				face(mOff, x, h - y, WEST);
+				face(mOn, x, h - y, EAST);
 			}
 		
 		}
