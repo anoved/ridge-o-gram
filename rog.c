@@ -1,11 +1,3 @@
-/*
-
-Usage:
-
-	rog IMAGE1 IMAGE2 > stl
-
-*/
-
 #include <stdio.h>
 
 #include <libtrix.h>
@@ -51,33 +43,31 @@ void face(trix_mesh *mesh, int x, int y, ridge_slope face) {
 	(void)trixAddTriangle(mesh, &t1);
 }
 
-
-
 int MergeImages(void) {
 	
-	bitmap b1, b2;
+	bitmap bWest, bEast;
 	trix_mesh *mOn, *mOff;
 	int depth;
 	unsigned long offset;
 	int w, h, x, y;
 	
-	int on1, on2;
+	int onWest, onEast;
 	
 	// load images (note, we load as grayscale)
-	b1.data = stbi_load("face1b.jpg", &b1.w, &b1.h, &depth, 1);
-	b2.data = stbi_load("face2b.jpg", &b2.w, &b2.h, &depth, 1);
-	if (b1.data == NULL || b2.data == NULL) {
+	bWest.data = stbi_load("face1b.jpg", &bWest.w, &bWest.h, &depth, 1);
+	bEast.data = stbi_load("face2b.jpg", &bEast.w, &bEast.h, &depth, 1);
+	if (bWest.data == NULL || bEast.data == NULL) {
 		fprintf(stderr, "%s\n", stbi_failure_reason());
 		return 1;
 	}
 	
 	// validate that dimensions match
-	if (b1.w != b2.w || b1.h != b2.h) {
+	if (bWest.w != bEast.w || bWest.h != bEast.h) {
 		fprintf(stderr, "image dimensions do not match\n");
 		return 1;
 	}
-	w = b1.w;
-	h = b1.h;
+	w = bWest.w;
+	h = bWest.h;
 	
 	if (trixCreate(&mOn, "onpixels") != TRIX_OK) {
 		return 1;
@@ -91,34 +81,34 @@ int MergeImages(void) {
 		
 			offset = (y * w) + x;
 			
-			if (b1.data[offset] > threshold) {
-				on1 = 1;
+			if (bWest.data[offset] > threshold) {
+				onWest = 1;
 			} else {
-				on1 = 0;
+				onWest = 0;
 			}
 			
-			if (b2.data[offset] > threshold) {
-				on2 = 1;
+			if (bEast.data[offset] > threshold) {
+				onEast = 1;
 			} else {
-				on2 = 0;
+				onEast = 0;
 			}
 			
-			if (on1 && on2) {
+			if (onWest && onEast) {
 				// both on
 				face(mOn, x, h - y, WEST);
 				face(mOn, x, h - y, EAST);
 			}
-			else if (!on1 && !on2) {
+			else if (!onWest && !onEast) {
 				// both off
 				face(mOff, x, h - y, WEST);
 				face(mOff, x, h - y, EAST);
 			}
-			else if (on1 && !on2) {
+			else if (onWest && !onEast) {
 				// west on, east off
 				face(mOn, x, h - y, WEST);
 				face(mOff, x, h - y, EAST);
 			}
-			else if (!on1 && on2) {
+			else if (!onWest && onEast) {
 				// west off, east on
 				face(mOff, x, h - y, WEST);
 				face(mOn, x, h - y, EAST);
@@ -137,8 +127,8 @@ int MergeImages(void) {
 	trixRelease(&mOn);
 	trixRelease(&mOff);
 	
-	stbi_image_free(b1.data);
-	stbi_image_free(b2.data);
+	stbi_image_free(bWest.data);
+	stbi_image_free(bEast.data);
 	
 	return 0;
 }
