@@ -4,12 +4,14 @@
 #include "stb_image.h"
 
 typedef struct {
+	float xy_scale; 
 	float onbase_h; // height of "on" base layer
 	float offbase_h; // height of "off" base layer
 	float ridge_h; // height of ridge layer
 } Settings;
 
 Settings CONFIG = {
+	1.0,
 	0.25,
 	0.25,
 	0.5
@@ -358,6 +360,8 @@ void BaseWalls(trix_mesh *mOn, trix_mesh *mOff, trix_vertex *v, int x, int y, in
 
 void updateVertices(trix_vertex *v, float x, float y) {
 	
+	int i;
+	
 	v[0].x = x - 0.5;
 	v[0].y = y + 0.5;
 	v[0].z = CONFIG.offbase_h + CONFIG.onbase_h;
@@ -477,6 +481,12 @@ void updateVertices(trix_vertex *v, float x, float y) {
 	v[29].x = x;
 	v[29].y = y + 0.5;
 	v[29].z = CONFIG.onbase_h;
+	
+	for (i = 0; i < 30; i++) {
+		v[i].x *= CONFIG.xy_scale;
+		v[i].y *= CONFIG.xy_scale;
+		//v[i].z *= CONFIG.xy_scale;
+	}
 }
 
 int MergeImages(void) {
