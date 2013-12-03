@@ -317,25 +317,35 @@ void off_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	}
 }
 
-void westwall(trix_mesh *mon, trix_mesh *moff, trix_vertex *v) {
-	quad(mon,  &v[17], &v[21], &v[18], &v[14]);
-	quad(moff, &v[0], &v[17], &v[14], &v[1]);
+
+void BaseWalls(trix_mesh *mOn, trix_mesh *mOff, trix_vertex *v, int x, int y, int w, int h) {
+	
+	// west
+	if (x == 0) {
+		quad(mOn, &v[17], &v[21], &v[18], &v[14]);
+		quad(mOff, &v[0], &v[17], &v[14], &v[1]);
+	}
+	
+	// east
+	if (x + 1 == w) {
+		quad(mOn, &v[15], &v[19], &v[20], &v[16]);
+		quad(mOff, &v[4], &v[15], &v[16], &v[5]);
+	}
+	
+	// north
+	if (y == 0) {
+		quad(mOn, &v[17], &v[16], &v[20], &v[21]);
+		quad(mOff, &v[0], &v[5], &v[16], &v[17]);
+	}
+	
+	// south
+	if (y + 1 == h) {
+		quad(mOn, &v[14], &v[18], &v[19], &v[15]);
+		quad(mOff, &v[1], &v[14], &v[15], &v[4]);
+	}
+			
 }
 
-void northwall(trix_mesh *mon, trix_mesh *moff, trix_vertex *v) {
-	quad(mon,  &v[17], &v[16], &v[20], &v[21]);
-	quad(moff, &v[0], &v[5], &v[16], &v[17]);
-}
-
-void eastwall(trix_mesh *mon, trix_mesh *moff, trix_vertex *v) {
-	quad(mon,  &v[15], &v[19], &v[20], &v[16]);
-	quad(moff, &v[4], &v[15], &v[16], &v[5]);
-}
-
-void southwall(trix_mesh *mon, trix_mesh *moff, trix_vertex *v) {
-	quad(mon,  &v[14], &v[18], &v[19], &v[15]);
-	quad(moff, &v[1], &v[14], &v[15], &v[4]);
-}
 
 void updateVertices(trix_vertex *v, float x, float y) {
 	
@@ -503,20 +513,8 @@ int MergeImages(void) {
 			
 			updateVertices(v, (float)x, (float)(h - y));
 			
+			BaseWalls(mOn, mOff, v, x, y, w, h);
 			
-			if (x == 0) {
-				westwall(mOn, mOff, v);
-			}
-			if (x + 1 == w) {
-				eastwall(mOn, mOff, v);
-			}
-			
-			if (y == 0) {
-				northwall(mOn, mOff, v);
-			}
-			if(y + 1 == h) {
-				southwall(mOn, mOff, v);
-			}
 			
 			offset = (y * w) + x;
 			
