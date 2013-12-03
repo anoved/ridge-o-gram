@@ -337,139 +337,127 @@ void southwall(trix_mesh *mon, trix_mesh *moff, trix_vertex *v) {
 	quad(moff, &v[1], &v[14], &v[15], &v[4]);
 }
 
-void updateVertices(trix_vertex *va, float x, float y) {
+void updateVertices(trix_vertex *v, float x, float y) {
 	
-	// assumes va is allocated/extant with 30 elements
+	v[0].x = x - 0.5;
+	v[0].y = y + 0.5;
+	v[0].z = 0.5;
 	
-	va[0].x = x - 0.5;
-	va[0].y = y + 0.5;
-	va[0].z = 0.5;
+	v[1].x = x - 0.5;
+	v[1].y = y - 0.5;
+	v[1].z = 0.5;
 	
-	va[1].x = x - 0.5;
-	va[1].y = y - 0.5;
-	va[1].z = 0.5;
+	v[2].x = x;
+	v[2].y = y - 0.5;
+	v[2].z = 1.0;
 	
-	va[2].x = x;
-	va[2].y = y - 0.5;
-	va[2].z = 1.0;
+	v[3].x = x;
+	v[3].y = y + 0.5;
+	v[3].z = 1.0;
 	
-	va[3].x = x;
-	va[3].y = y + 0.5;
-	va[3].z = 1.0;
+	v[4].x = x + 0.5;
+	v[4].y = y - 0.5;
+	v[4].z = 0.5;
 	
-	va[4].x = x + 0.5;
-	va[4].y = y - 0.5;
-	va[4].z = 0.5;
+	v[5].x = x + 0.5;
+	v[5].y = y + 0.5;
+	v[5].z = 0.5;
 	
-	va[5].x = x + 0.5;
-	va[5].y = y + 0.5;
-	va[5].z = 0.5;
+	v[6].x = x - 0.25;
+	v[6].y = y - 0.25;
+	v[6].z = 0.5;
 	
-	// trunk top
-	
-	va[6].x = x - 0.25;
-	va[6].y = y - 0.25;
-	va[6].z = 0.5;
-	
-	va[7].x = x + 0.25;
-	va[7].y = y - 0.25;
-	va[7].z = 0.5;
+	v[7].x = x + 0.25;
+	v[7].y = y - 0.25;
+	v[7].z = 0.5;
 
-	va[8].x = x + 0.25;
-	va[8].y = y + 0.25;
-	va[8].z = 0.5;
+	v[8].x = x + 0.25;
+	v[8].y = y + 0.25;
+	v[8].z = 0.5;
 	
-	va[9].x = x - 0.25;
-	va[9].y = y + 0.25;
-	va[9].z = 0.5;
+	v[9].x = x - 0.25;
+	v[9].y = y + 0.25;
+	v[9].z = 0.5;
 	
-	// trunk bottom
+	v[10].x = x - 0.25;
+	v[10].y = y - 0.25;
+	v[10].z = 0.25;
 	
-	va[10].x = x - 0.25;
-	va[10].y = y - 0.25;
-	va[10].z = 0.25;
+	v[11].x = x + 0.25;
+	v[11].y = y - 0.25;
+	v[11].z = 0.25;
 	
-	va[11].x = x + 0.25;
-	va[11].y = y - 0.25;
-	va[11].z = 0.25;
+	v[12].x = x + 0.25;
+	v[12].y = y + 0.25;
+	v[12].z = 0.25;
 	
-	va[12].x = x + 0.25;
-	va[12].y = y + 0.25;
-	va[12].z = 0.25;
+	v[13].x = x - 0.25;
+	v[13].y = y + 0.25;
+	v[13].z = 0.25;
 	
-	va[13].x = x - 0.25;
-	va[13].y = y + 0.25;
-	va[13].z = 0.25;
-
-	// base top
-
-	va[14].x = x - 0.5;
-	va[14].y = y - 0.5;
-	va[14].z = 0.25;
+	v[14].x = x - 0.5;
+	v[14].y = y - 0.5;
+	v[14].z = 0.25;
 	
-	va[15].x = x + 0.5;
-	va[15].y = y - 0.5;
-	va[15].z = 0.25;
+	v[15].x = x + 0.5;
+	v[15].y = y - 0.5;
+	v[15].z = 0.25;
 	
-	va[16].x = x + 0.5;
-	va[16].y = y + 0.5;
-	va[16].z = 0.25;
+	v[16].x = x + 0.5;
+	v[16].y = y + 0.5;
+	v[16].z = 0.25;
 	
-	va[17].x = x - 0.5;
-	va[17].y = y + 0.5;
-	va[17].z = 0.25;
+	v[17].x = x - 0.5;
+	v[17].y = y + 0.5;
+	v[17].z = 0.25;
 	
-	// base bottom
+	v[18].x = x - 0.5;
+	v[18].y = y - 0.5;
+	v[18].z = 0.0;
 	
-	va[18].x = x - 0.5;
-	va[18].y = y - 0.5;
-	va[18].z = 0.0;
+	v[19].x = x + 0.5;
+	v[19].y = y - 0.5;
+	v[19].z = 0.0;
 	
-	va[19].x = x + 0.5;
-	va[19].y = y - 0.5;
-	va[19].z = 0.0;
+	v[20].x = x + 0.5;
+	v[20].y = y + 0.5;
+	v[20].z = 0.0;
 	
-	va[20].x = x + 0.5;
-	va[20].y = y + 0.5;
-	va[20].z = 0.0;
+	v[21].x = x - 0.5;
+	v[21].y = y + 0.5;
+	v[21].z = 0.0;
 	
-	va[21].x = x - 0.5;
-	va[21].y = y + 0.5;
-	va[21].z = 0.0;
+	v[22].x = x;
+	v[22].y = y - 0.25;
+	v[22].z = 0.25;
 	
-	// mid points (for type C & D)
+	v[23].x = x;
+	v[23].y = y + 0.25;
+	v[23].z = 0.25;
 	
-	va[22].x = x;
-	va[22].y = y - 0.25;
-	va[22].z = 0.25;
+	v[24].x = x;
+	v[24].y = y - 0.25;
+	v[24].z = 0.5;
 	
-	va[23].x = x;
-	va[23].y = y + 0.25;
-	va[23].z = 0.25;
+	v[25].x = x;
+	v[25].y = y + 0.25;
+	v[25].z = 0.5;
 	
-	va[24].x = x;
-	va[24].y = y - 0.25;
-	va[24].z = 0.5;
+	v[26].x = x;
+	v[26].y = y - 0.5;
+	v[26].z = 0.5;
 	
-	va[25].x = x;
-	va[25].y = y + 0.25;
-	va[25].z = 0.5;
+	v[27].x = x;
+	v[27].y = y + 0.5;
+	v[27].z = 0.5;
 	
-	va[26].x = x;
-	va[26].y = y - 0.5;
-	va[26].z = 0.5;
+	v[28].x = x;
+	v[28].y = y - 0.5;
+	v[28].z = 0.25;
 	
-	va[27].x = x;
-	va[27].y = y + 0.5;
-	va[27].z = 0.5;
-	
-	va[28].x = x;
-	va[28].y = y - 0.5;
-	va[28].z = 0.25;
-	
-	va[29].x = x;
-	va[29].y = y + 0.5;
-	va[29].z = 0.25;
+	v[29].x = x;
+	v[29].y = y + 0.5;
+	v[29].z = 0.25;
 }
 
 int MergeImages(void) {
@@ -479,11 +467,9 @@ int MergeImages(void) {
 	int depth;
 	unsigned long offset;
 	int w, h, x, y;
-	float fx, fy;
 	int onWest, onEast;
 	
 	// booleans indicating whether the north/south sides of east/west ridges need to be capped
-//	int north_east, north_west, south_east, south_west;
 	int caps[4];
 	
 	// updated for each pixel
@@ -515,10 +501,7 @@ int MergeImages(void) {
 	for (y = 0; y < h; y++) {
 		for (x = 0; x < w; x++) {
 			
-			fx = (float)x;
-			fy = (float)(h - y);
-			
-			updateVertices(v, fx, fy);
+			updateVertices(v, (float)x, (float)(h - y));
 			
 			
 			if (x == 0) {
@@ -535,13 +518,6 @@ int MergeImages(void) {
 				southwall(mOn, mOff, v);
 			}
 			
-			
-			// the on_/off_ functions should be in charge of capping north/south ridges
-			// it should occur in two cases:
-			// - perimeter (y == 0 or y + 1 == h)
-			// - neighbor of different type
-			
-			
 			offset = (y * w) + x;
 			
 			if (bWest.data[offset] > threshold) {
@@ -556,57 +532,46 @@ int MergeImages(void) {
 				onEast = 0;
 			}
 			
-			
+			// nw, ne, sw, se; no caps by default
 			caps[0] = 0; caps[1] = 0; caps[2] = 0; caps[3] = 0;
-/*
-			north_west = 0;
-			north_east = 0;
-			south_west = 0;
-			south_east = 0;*/
 			
 			// north caps?
 			if (y == 0) {
-				// this is northenmost; always cap.
+				// nw and ne
 				caps[0] = 1;
 				caps[1] = 1;
-				//north_west = 1;
-				//north_east = 1;
 			} else {
 				// check north neighbor
 				offset = ((y - 1) * w) + x;
 				
-				
+				// nw
 				if (onWest != (bWest.data[offset] > threshold)) {
-					//north_west = 1;
 					caps[0] = 1;
 				}
 				
+				// ne
 				if (onEast != (bEast.data[offset] > threshold)) {
 					caps[1] = 1;
-					//north_east = 1;
 				}
 			}
 			
 			// south caps?
 			if (y+1 == h) {
-				// this is southernmost; always cap.
+				// sw and se
 				caps[2] = 1;
 				caps[3] = 1;
-				//south_west = 1;
-				//south_east = 1;
 			} else {
 				// check south neighbor
 				offset = ((y + 1) * w) + x;
 				
-				
+				// sw
 				if (onWest != (bWest.data[offset] > threshold)) {
 					caps[2] = 1;
-					//south_west = 1;
 				}
 				
+				// se
 				if (onEast != (bEast.data[offset] > threshold)) {
 					caps[3] = 1;
-					//south_east = 1;
 				}
 			}
 			
@@ -630,9 +595,6 @@ int MergeImages(void) {
 				on_d(mOn, v, caps);
 				off_d(mOff, v, caps);
 			}
-			
-			
-			
 		}
 	}
 	
