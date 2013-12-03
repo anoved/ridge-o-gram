@@ -4,6 +4,18 @@
 #include "stb_image.h"
 
 typedef struct {
+	float onbase_h; // height of "on" base layer
+	float offbase_h; // height of "off" base layer
+	float ridge_h; // height of ridge layer
+} Settings;
+
+Settings CONFIG = {
+	0.25,
+	0.25,
+	0.5
+};
+
+typedef struct {
 	int w, h;
 	unsigned char *data;
 } bitmap;
@@ -317,7 +329,6 @@ void off_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	}
 }
 
-
 void BaseWalls(trix_mesh *mOn, trix_mesh *mOff, trix_vertex *v, int x, int y, int w, int h) {
 	
 	// west
@@ -343,83 +354,81 @@ void BaseWalls(trix_mesh *mOn, trix_mesh *mOff, trix_vertex *v, int x, int y, in
 		quad(mOn, &v[14], &v[18], &v[19], &v[15]);
 		quad(mOff, &v[1], &v[14], &v[15], &v[4]);
 	}
-			
 }
-
 
 void updateVertices(trix_vertex *v, float x, float y) {
 	
 	v[0].x = x - 0.5;
 	v[0].y = y + 0.5;
-	v[0].z = 0.5;
+	v[0].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[1].x = x - 0.5;
 	v[1].y = y - 0.5;
-	v[1].z = 0.5;
+	v[1].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[2].x = x;
 	v[2].y = y - 0.5;
-	v[2].z = 1.0;
+	v[2].z = CONFIG.onbase_h + CONFIG.offbase_h + CONFIG.ridge_h;
 	
 	v[3].x = x;
 	v[3].y = y + 0.5;
-	v[3].z = 1.0;
+	v[3].z = CONFIG.onbase_h + CONFIG.offbase_h + CONFIG.ridge_h;
 	
 	v[4].x = x + 0.5;
 	v[4].y = y - 0.5;
-	v[4].z = 0.5;
+	v[4].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[5].x = x + 0.5;
 	v[5].y = y + 0.5;
-	v[5].z = 0.5;
+	v[5].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[6].x = x - 0.25;
 	v[6].y = y - 0.25;
-	v[6].z = 0.5;
+	v[6].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[7].x = x + 0.25;
 	v[7].y = y - 0.25;
-	v[7].z = 0.5;
+	v[7].z = CONFIG.offbase_h + CONFIG.onbase_h;
 
 	v[8].x = x + 0.25;
 	v[8].y = y + 0.25;
-	v[8].z = 0.5;
+	v[8].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[9].x = x - 0.25;
 	v[9].y = y + 0.25;
-	v[9].z = 0.5;
+	v[9].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[10].x = x - 0.25;
 	v[10].y = y - 0.25;
-	v[10].z = 0.25;
+	v[10].z = CONFIG.onbase_h;
 	
 	v[11].x = x + 0.25;
 	v[11].y = y - 0.25;
-	v[11].z = 0.25;
+	v[11].z = CONFIG.onbase_h;
 	
 	v[12].x = x + 0.25;
 	v[12].y = y + 0.25;
-	v[12].z = 0.25;
+	v[12].z = CONFIG.onbase_h;
 	
 	v[13].x = x - 0.25;
 	v[13].y = y + 0.25;
-	v[13].z = 0.25;
+	v[13].z = CONFIG.onbase_h;
 	
 	v[14].x = x - 0.5;
 	v[14].y = y - 0.5;
-	v[14].z = 0.25;
+	v[14].z = CONFIG.onbase_h;
 	
 	v[15].x = x + 0.5;
 	v[15].y = y - 0.5;
-	v[15].z = 0.25;
+	v[15].z = CONFIG.onbase_h;
 	
 	v[16].x = x + 0.5;
 	v[16].y = y + 0.5;
-	v[16].z = 0.25;
+	v[16].z = CONFIG.onbase_h;
 	
 	v[17].x = x - 0.5;
 	v[17].y = y + 0.5;
-	v[17].z = 0.25;
+	v[17].z = CONFIG.onbase_h;
 	
 	v[18].x = x - 0.5;
 	v[18].y = y - 0.5;
@@ -439,35 +448,35 @@ void updateVertices(trix_vertex *v, float x, float y) {
 	
 	v[22].x = x;
 	v[22].y = y - 0.25;
-	v[22].z = 0.25;
+	v[22].z = CONFIG.onbase_h;
 	
 	v[23].x = x;
 	v[23].y = y + 0.25;
-	v[23].z = 0.25;
+	v[23].z = CONFIG.onbase_h;
 	
 	v[24].x = x;
 	v[24].y = y - 0.25;
-	v[24].z = 0.5;
+	v[24].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[25].x = x;
 	v[25].y = y + 0.25;
-	v[25].z = 0.5;
+	v[25].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[26].x = x;
 	v[26].y = y - 0.5;
-	v[26].z = 0.5;
+	v[26].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[27].x = x;
 	v[27].y = y + 0.5;
-	v[27].z = 0.5;
+	v[27].z = CONFIG.offbase_h + CONFIG.onbase_h;
 	
 	v[28].x = x;
 	v[28].y = y - 0.5;
-	v[28].z = 0.25;
+	v[28].z = CONFIG.onbase_h;
 	
 	v[29].x = x;
 	v[29].y = y + 0.5;
-	v[29].z = 0.25;
+	v[29].z = CONFIG.onbase_h;
 }
 
 int MergeImages(void) {
