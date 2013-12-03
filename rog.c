@@ -4,7 +4,8 @@
 #include "stb_image.h"
 
 typedef struct {
-	float xy_scale; 
+	float xy_scale;
+	int centered;
 	float onbase_h; // height of "on" base layer
 	float offbase_h; // height of "off" base layer
 	float ridge_h; // height of ridge layer
@@ -12,6 +13,7 @@ typedef struct {
 
 Settings CONFIG = {
 	1.0,
+	1,
 	0.25,
 	0.25,
 	0.5
@@ -497,7 +499,7 @@ int MergeImages(void) {
 	unsigned long offset;
 	int w, h, x, y;
 	int onWest, onEast;
-	
+	float fx, fy;
 	// booleans indicating whether the north/south sides of east/west ridges need to be capped
 	int caps[4];
 	
@@ -530,7 +532,15 @@ int MergeImages(void) {
 	for (y = 0; y < h; y++) {
 		for (x = 0; x < w; x++) {
 			
-			updateVertices(v, (float)x, (float)(h - y));
+			if (CONFIG.centered) {
+				fx = (float)(x - (w/2));
+				fy = (float)((h - y) - (h/2));
+			} else {
+				fx = (float)x;
+				fy = (float)(h - y);
+			}	
+			
+			updateVertices(v, fx, fy);
 			
 			BaseWalls(mOn, mOff, v, x, y, w, h);
 			
