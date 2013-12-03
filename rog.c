@@ -34,7 +34,7 @@ void tri(trix_mesh *mesh, trix_vertex *a, trix_vertex *b, trix_vertex *c) {
 #define q(a, b, c, d) quad(mesh, &v[(a)], &v[(b)], &v[(c)], &v[(d)])
 #define t(a, b, c)    tri(mesh, &v[(a)], &v[(b)], &v[(c)])
 
-void on_a(trix_mesh *mesh, trix_vertex *v) {
+void on_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 	// ridge top
 	q(0, 1, 2, 3);
@@ -66,10 +66,27 @@ void on_a(trix_mesh *mesh, trix_vertex *v) {
 	
 	// base bottom
 	q(18, 21, 20, 19);
+	
+	// nw
+	if (caps[0]) {
+		t(3, 27, 0);
+	}
+	// ne
+	if (caps[1]) {
+		t(5, 27, 3);
+	}
+	// sw
+	if (caps[2]) {
+		t(2, 1, 26);
+	}
+	// se
+	if (caps[3]) {
+		t(4, 2, 26);
+	}
 
 }
 
-void off_a(trix_mesh *mesh, trix_vertex *v) {
+void off_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 	// top ring
 	q(0, 1, 6, 9);
@@ -94,9 +111,11 @@ void off_a(trix_mesh *mesh, trix_vertex *v) {
 	q(12, 16, 15, 11);
 	q(29, 16, 12, 23);
 	q(17, 29, 23, 13);
+	
+	// no caps
 }
 
-void on_b(trix_mesh *mesh, trix_vertex *v) {
+void on_b(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 	// top
 	q(17, 14, 15, 16);
@@ -104,9 +123,11 @@ void on_b(trix_mesh *mesh, trix_vertex *v) {
 	// bottom
 	q(21, 20, 19, 18);
 
+	// no caps
+
 }
 
-void off_b(trix_mesh *mesh, trix_vertex *v) {
+void off_b(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 	// ridge top
 	q(0, 1, 2, 3);
@@ -115,9 +136,27 @@ void off_b(trix_mesh *mesh, trix_vertex *v) {
 	// bottom
 	q(17, 29, 28, 14);
 	q(29, 16, 15, 28);
+	
+	// nw
+	if (caps[0]) {
+		t(3, 27, 0);
+	}
+	// ne
+	if (caps[1]) {
+		t(5, 27, 3);
+	}
+	// sw
+	if (caps[2]) {
+		t(2, 1, 26);
+	}
+	// se
+	if (caps[3]) {
+		t(4, 2, 26);
+	}
+
 }
 
-void on_c(trix_mesh *mesh, trix_vertex *v) {
+void on_c(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 	// half ridge top
 	q(0, 1, 2, 3);
@@ -145,10 +184,19 @@ void on_c(trix_mesh *mesh, trix_vertex *v) {
 	
 	// bottom
 	q(18, 21, 20, 19);
-		
+	
+	// nw
+	if (caps[0]) {
+		t(3, 27, 0);
+	}
+	// sw
+	if (caps[2]) {
+		t(2, 1, 26);
+	}
+	
 }
 
-void off_c(trix_mesh *mesh, trix_vertex *v) {
+void off_c(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 	// half ridge top
 	q(2, 4, 5, 3);
@@ -175,9 +223,20 @@ void off_c(trix_mesh *mesh, trix_vertex *v) {
 	q(23, 29, 16, 12);
 	q(17, 29, 23, 13);
 	q(23, 12, 11, 22);
+	
+
+	// ne
+	if (caps[1]) {
+		t(5, 27, 3);
+	}
+	// se
+	if (caps[3]) {
+		t(4, 2, 26);
+	}
+
 }
 
-void on_d(trix_mesh *mesh, trix_vertex *v) {
+void on_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 	// half ridge top
 	q(2, 4, 5, 3);
@@ -207,10 +266,21 @@ void on_d(trix_mesh *mesh, trix_vertex *v) {
 	
 	// bottom
 	q(18, 21, 20, 19);
+	
+	
+	// ne
+	if (caps[1]) {
+		t(5, 27, 3);
+	}
+	// se
+	if (caps[3]) {
+		t(4, 2, 26);
+	}
+
 
 }
 
-void off_d(trix_mesh *mesh, trix_vertex *v) {
+void off_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 	// half ridge top
 	q(0, 1, 2, 3);
@@ -240,6 +310,16 @@ void off_d(trix_mesh *mesh, trix_vertex *v) {
 
 	q(23, 22, 10, 13);
 
+
+
+	// nw
+	if (caps[0]) {
+		t(3, 27, 0);
+	}
+	// sw
+	if (caps[2]) {
+		t(2, 1, 26);
+	}
 }
 
 void westwall(trix_mesh *mon, trix_mesh *moff, trix_vertex *v) {
@@ -407,6 +487,10 @@ int MergeImages(void) {
 	float fx, fy;
 	int onWest, onEast;
 	
+	// booleans indicating whether the north/south sides of east/west ridges need to be capped
+//	int north_east, north_west, south_east, south_west;
+	int caps[4];
+	
 	// updated for each pixel
 	trix_vertex v[30];
 	
@@ -457,6 +541,10 @@ int MergeImages(void) {
 			}
 			
 			
+			// the on_/off_ functions should be in charge of capping north/south ridges
+			// it should occur in two cases:
+			// - perimeter (y == 0 or y + 1 == h)
+			// - neighbor of different type
 			
 			
 			offset = (y * w) + x;
@@ -473,27 +561,83 @@ int MergeImages(void) {
 				onEast = 0;
 			}
 			
+			
+			caps[0] = 0; caps[1] = 0; caps[2] = 0; caps[3] = 0;
+/*
+			north_west = 0;
+			north_east = 0;
+			south_west = 0;
+			south_east = 0;*/
+			
+			// north caps?
+			if (y == 0) {
+				// this is northenmost; always cap.
+				caps[0] = 1;
+				caps[1] = 1;
+				//north_west = 1;
+				//north_east = 1;
+			} else {
+				// check north neighbor
+				offset = ((y - 1) * w) + x;
+				
+				
+				if (onWest != (bWest.data[offset] > threshold)) {
+					//north_west = 1;
+					caps[0] = 1;
+				}
+				
+				if (onEast != (bEast.data[offset] > threshold)) {
+					caps[1] = 1;
+					//north_east = 1;
+				}
+			}
+			
+			// south caps?
+			if (y+1 == h) {
+				// this is southernmost; always cap.
+				caps[2] = 1;
+				caps[3] = 1;
+				//south_west = 1;
+				//south_east = 1;
+			} else {
+				// check south neighbor
+				offset = ((y + 1) * w) + x;
+				
+				
+				if (onWest != (bWest.data[offset] > threshold)) {
+					caps[2] = 1;
+					//south_west = 1;
+				}
+				
+				if (onEast != (bEast.data[offset] > threshold)) {
+					caps[3] = 1;
+					//south_east = 1;
+				}
+			}
+			
 			if (onWest && onEast) {
 				// both on
-				on_a(mOn, v);
-				off_a(mOff, v);
+				on_a(mOn, v, caps);
+				off_a(mOff, v, caps);
 			}
 			else if (!onWest && !onEast) {
 				// both off
-				on_b(mOn, v);
-				off_b(mOff, v);
+				on_b(mOn, v, caps);
+				off_b(mOff, v, caps);
 			}
 			else if (onWest && !onEast) {
 				// west on, east off
-				on_c(mOn, v);
-				off_c(mOff, v);
+				on_c(mOn, v, caps);
+				off_c(mOff, v, caps);
 			}
 			else if (!onWest && onEast) {
 				// west off, east on
-				on_d(mOn, v);
-				off_d(mOff, v);
+				on_d(mOn, v, caps);
+				off_d(mOff, v, caps);
 			}
-		
+			
+			
+			
 		}
 	}
 	
