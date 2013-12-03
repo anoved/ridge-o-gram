@@ -3,11 +3,6 @@
 #include <libtrix.h>
 #include "stb_image.h"
 
-typedef enum {
-	WEST,
-	EAST
-} ridge_slope;
-
 typedef struct {
 	int w, h;
 	unsigned char *data;
@@ -495,8 +490,8 @@ int MergeImages(void) {
 	trix_vertex v[30];
 	
 	// load images (note, we load as grayscale)
-	bWest.data = stbi_load("test-a.png", &bWest.w, &bWest.h, &depth, 1);
-	bEast.data = stbi_load("test-b.png", &bEast.w, &bEast.h, &depth, 1);
+	bWest.data = stbi_load("face1b.jpg", &bWest.w, &bWest.h, &depth, 1);
+	bEast.data = stbi_load("face2b.jpg", &bEast.w, &bEast.h, &depth, 1);
 	if (bWest.data == NULL || bEast.data == NULL) {
 		fprintf(stderr, "%s\n", stbi_failure_reason());
 		return 1;
@@ -643,8 +638,8 @@ int MergeImages(void) {
 	
 	// output
 	
-	trixWrite(mOn, "test-on.stl", TRIX_STL_ASCII);
-	trixWrite(mOff, "test-off.stl", TRIX_STL_ASCII);
+	trixWrite(mOn, "face-object.stl", TRIX_STL_BINARY);
+	trixWrite(mOff, "face-ground.stl", TRIX_STL_BINARY);
 	
 	// cleanup
 	
