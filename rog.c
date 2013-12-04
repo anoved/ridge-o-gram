@@ -12,9 +12,9 @@ typedef struct {
 	char *stl_base; // base output path (white/black suffixes will be appended)
 	float xy_scale; // factor applied to x/y coordinates
 	int centered; // boolean; if false, southwest corner output at 0,0
-	float onbase_h; // height of white (lower) layer
-	float offbase_h; // height of black (middle) layer
-	float ridge_h; // height of ridge (upper) layer
+	float h_white; // height of white (lower) base layer
+	float h_black; // height of black (middle) base layer
+	float h_ridge; // height of ridge (upper) image layer
 	int threshold; // pixel brightness > threshold considered white
 	int ascii; // boolean; if true, output ascii stl instead of binary
 } Settings;
@@ -56,7 +56,7 @@ void tri(trix_mesh *mesh, trix_vertex *a, trix_vertex *b, trix_vertex *c) {
 #define q(a, b, c, d) quad(mesh, &v[(a)], &v[(b)], &v[(c)], &v[(d)])
 #define t(a, b, c)    tri(mesh, &v[(a)], &v[(b)], &v[(c)])
 
-void on_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
+void white_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 	// ridge top
 	q(0, 1, 2, 3);
@@ -108,7 +108,7 @@ void on_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 }
 
-void off_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
+void black_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 	// top ring
 	q(0, 1, 6, 9);
@@ -137,7 +137,7 @@ void off_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	// no caps
 }
 
-void on_b(trix_mesh *mesh, trix_vertex *v, int *caps) {
+void white_b(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 	// top
 	q(17, 14, 15, 16);
@@ -149,7 +149,7 @@ void on_b(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 }
 
-void off_b(trix_mesh *mesh, trix_vertex *v, int *caps) {
+void black_b(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 	// ridge top
 	q(0, 1, 2, 3);
@@ -178,7 +178,7 @@ void off_b(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 }
 
-void on_c(trix_mesh *mesh, trix_vertex *v, int *caps) {
+void white_c(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 	// half ridge top
 	q(0, 1, 2, 3);
@@ -218,7 +218,7 @@ void on_c(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	
 }
 
-void off_c(trix_mesh *mesh, trix_vertex *v, int *caps) {
+void black_c(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 	// half ridge top
 	q(2, 4, 5, 3);
@@ -258,7 +258,7 @@ void off_c(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 }
 
-void on_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
+void white_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 	// half ridge top
 	q(2, 4, 5, 3);
@@ -302,7 +302,7 @@ void on_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 }
 
-void off_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
+void black_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
 
 	// half ridge top
 	q(0, 1, 2, 3);
@@ -377,75 +377,75 @@ void updateVertices(trix_vertex *v, float x, float y) {
 	
 	v[0].x = x - 0.5;
 	v[0].y = y + 0.5;
-	v[0].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[0].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[1].x = x - 0.5;
 	v[1].y = y - 0.5;
-	v[1].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[1].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[2].x = x;
 	v[2].y = y - 0.5;
-	v[2].z = CONFIG.onbase_h + CONFIG.offbase_h + CONFIG.ridge_h;
+	v[2].z = CONFIG.h_white + CONFIG.h_black + CONFIG.h_ridge;
 	
 	v[3].x = x;
 	v[3].y = y + 0.5;
-	v[3].z = CONFIG.onbase_h + CONFIG.offbase_h + CONFIG.ridge_h;
+	v[3].z = CONFIG.h_white + CONFIG.h_black + CONFIG.h_ridge;
 	
 	v[4].x = x + 0.5;
 	v[4].y = y - 0.5;
-	v[4].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[4].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[5].x = x + 0.5;
 	v[5].y = y + 0.5;
-	v[5].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[5].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[6].x = x - 0.25;
 	v[6].y = y - 0.25;
-	v[6].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[6].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[7].x = x + 0.25;
 	v[7].y = y - 0.25;
-	v[7].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[7].z = CONFIG.h_black + CONFIG.h_white;
 
 	v[8].x = x + 0.25;
 	v[8].y = y + 0.25;
-	v[8].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[8].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[9].x = x - 0.25;
 	v[9].y = y + 0.25;
-	v[9].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[9].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[10].x = x - 0.25;
 	v[10].y = y - 0.25;
-	v[10].z = CONFIG.onbase_h;
+	v[10].z = CONFIG.h_white;
 	
 	v[11].x = x + 0.25;
 	v[11].y = y - 0.25;
-	v[11].z = CONFIG.onbase_h;
+	v[11].z = CONFIG.h_white;
 	
 	v[12].x = x + 0.25;
 	v[12].y = y + 0.25;
-	v[12].z = CONFIG.onbase_h;
+	v[12].z = CONFIG.h_white;
 	
 	v[13].x = x - 0.25;
 	v[13].y = y + 0.25;
-	v[13].z = CONFIG.onbase_h;
+	v[13].z = CONFIG.h_white;
 	
 	v[14].x = x - 0.5;
 	v[14].y = y - 0.5;
-	v[14].z = CONFIG.onbase_h;
+	v[14].z = CONFIG.h_white;
 	
 	v[15].x = x + 0.5;
 	v[15].y = y - 0.5;
-	v[15].z = CONFIG.onbase_h;
+	v[15].z = CONFIG.h_white;
 	
 	v[16].x = x + 0.5;
 	v[16].y = y + 0.5;
-	v[16].z = CONFIG.onbase_h;
+	v[16].z = CONFIG.h_white;
 	
 	v[17].x = x - 0.5;
 	v[17].y = y + 0.5;
-	v[17].z = CONFIG.onbase_h;
+	v[17].z = CONFIG.h_white;
 	
 	v[18].x = x - 0.5;
 	v[18].y = y - 0.5;
@@ -465,35 +465,35 @@ void updateVertices(trix_vertex *v, float x, float y) {
 	
 	v[22].x = x;
 	v[22].y = y - 0.25;
-	v[22].z = CONFIG.onbase_h;
+	v[22].z = CONFIG.h_white;
 	
 	v[23].x = x;
 	v[23].y = y + 0.25;
-	v[23].z = CONFIG.onbase_h;
+	v[23].z = CONFIG.h_white;
 	
 	v[24].x = x;
 	v[24].y = y - 0.25;
-	v[24].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[24].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[25].x = x;
 	v[25].y = y + 0.25;
-	v[25].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[25].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[26].x = x;
 	v[26].y = y - 0.5;
-	v[26].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[26].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[27].x = x;
 	v[27].y = y + 0.5;
-	v[27].z = CONFIG.offbase_h + CONFIG.onbase_h;
+	v[27].z = CONFIG.h_black + CONFIG.h_white;
 	
 	v[28].x = x;
 	v[28].y = y - 0.5;
-	v[28].z = CONFIG.onbase_h;
+	v[28].z = CONFIG.h_white;
 	
 	v[29].x = x;
 	v[29].y = y + 0.5;
-	v[29].z = CONFIG.onbase_h;
+	v[29].z = CONFIG.h_white;
 	
 	for (i = 0; i < 30; i++) {
 		v[i].x *= CONFIG.xy_scale;
@@ -616,20 +616,20 @@ int MergeImages(void) {
 			}
 			
 			if (whiteWest && whiteEast) {
-				on_a(mwhite, v, caps);
-				off_a(mblack, v, caps);
+				white_a(mwhite, v, caps);
+				black_a(mblack, v, caps);
 			}
 			else if (!whiteWest && !whiteEast) {
-				on_b(mwhite, v, caps);
-				off_b(mblack, v, caps);
+				white_b(mwhite, v, caps);
+				black_b(mblack, v, caps);
 			}
 			else if (whiteWest && !whiteEast) {
-				on_c(mwhite, v, caps);
-				off_c(mblack, v, caps);
+				white_c(mwhite, v, caps);
+				black_c(mblack, v, caps);
 			}
 			else if (!whiteWest && whiteEast) {
-				on_d(mwhite, v, caps);
-				off_d(mblack, v, caps);
+				white_d(mwhite, v, caps);
+				black_d(mblack, v, caps);
 			}
 		}
 	}
@@ -669,21 +669,21 @@ int parseopts(int argc, char **argv) {
 		switch (c) {
 			case 'a':
 				// a for first of a b c layer thickness
-				if (sscanf(optarg, "%10f", &CONFIG.onbase_h) != 1 || CONFIG.onbase_h <= 0) {
+				if (sscanf(optarg, "%10f", &CONFIG.h_white) != 1 || CONFIG.h_white <= 0) {
 					fprintf(stderr, "-a must be a number greater than 0\n");
 					return 1;
 				}
 				break;
 			case 'b':
 				// b for second of a b c layer thickness
-				if (sscanf(optarg, "%10f", &CONFIG.offbase_h) != 1 || CONFIG.offbase_h <= 0) {
+				if (sscanf(optarg, "%10f", &CONFIG.h_black) != 1 || CONFIG.h_black <= 0) {
 					fprintf(stderr, "-b must be a number greater than 0\n");
 					return 1;
 				}
 				break;
 			case 'c':
 				// c for third of a b c layer thickness
-				if (sscanf(optarg, "%10f", &CONFIG.ridge_h) != 1 || CONFIG.ridge_h <= 0) {
+				if (sscanf(optarg, "%10f", &CONFIG.h_ridge) != 1 || CONFIG.h_ridge <= 0) {
 					fprintf(stderr, "-c must be a number greater than 0\n");
 					return 1;
 				}
