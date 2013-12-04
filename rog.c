@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 #include <libtrix.h>
 #include "stb_image.h"
@@ -509,12 +512,14 @@ int MergeImages(void) {
 	// booleans indicating whether the north/south sides of east/west ridges need to be capped
 	int caps[4];
 	
+	char *stl_white, *stl_black;
+	
 	// updated for each pixel
 	trix_vertex v[30];
 	
 	// load images (note, we load as grayscale)
-	bWest.data = stbi_load("face1b.jpg", &bWest.w, &bWest.h, &depth, 1);
-	bEast.data = stbi_load("face2b.jpg", &bEast.w, &bEast.h, &depth, 1);
+	bWest.data = stbi_load(CONFIG.img_west, &bWest.w, &bWest.h, &depth, 1);
+	bEast.data = stbi_load(CONFIG.img_east, &bEast.w, &bEast.h, &depth, 1);
 	if (bWest.data == NULL || bEast.data == NULL) {
 		fprintf(stderr, "%s\n", stbi_failure_reason());
 		return 1;
@@ -633,10 +638,20 @@ int MergeImages(void) {
 	
 	// output
 	
-	trixWrite(mOn, "face-object.stl", TRIX_STL_BINARY);
-	trixWrite(mOff, "face-ground.stl", TRIX_STL_BINARY);
+	stl_white = malloc(strlen(CONFIG.stl_base) + 12);
+	stl_black = malloc(strlen(CONFIG.stl_base) + 12);
+	strcpy(stl_white, CONFIG.stl_base);
+	strcat(stl_white, "-white.stl");
+	strcpy(stl_black, CONFIG.stl_base);
+	strcat(stl_black, "-black.stl");
+	
+	trixWrite(mOn, stl_white, TRIX_STL_BINARY);
+	trixWrite(mOff, stl_black, TRIX_STL_BINARY);
 	
 	// cleanup
+	
+	free(stl_white);
+	free(stl_black);
 	
 	trixRelease(&mOn);
 	trixRelease(&mOff);
@@ -647,8 +662,76 @@ int MergeImages(void) {
 	return 0;
 }
 
+// returns 0 on success
+int parseopts(int argc, char **argv) {
+	int c;
+	opterr = 0;
+	
+	while ((c = getopt(argc, argv, "a:b:c:s:o")) != -1) {
+		switch (c) {
+			case 'a':
+				// a for first of a b c layer thickness
+				if (sscanf(optarg, "%10f", &CONFIG.onbase_h) != 1 || CONFIG.onbase_h <= 0) {
+					fprintf(stderr, "-a must be a number greater than 0\n");
+					return 1;
+				}
+				break;
+			case 'b':
+				// b for second of a b c layer thickness
+				if (sscanf(optarg, "%10f", &CONFIG.offbase_h) != 1 || CONFIG.offbase_h <= 0) {
+					fprintf(stderr, "-b must be a number greater than 0\n");
+					return 1;
+				}
+				break;
+			case 'c':
+				// c for third of a b c layer thickness
+				if (sscanf(optarg, "%10f", &CONFIG.ridge_h) != 1 || CONFIG.ridge_h <= 0) {
+					fprintf(stderr, "-c must be a number greater than 0\n");
+					return 1;
+				}
+				break;
+			case 's':
+				// s for scale
+				if (sscanf(optarg, "%10f", &CONFIG.xy_scale) != 1 || CONFIG.xy_scale <= 0) {
+					fprintf(stderr, "-s must be a number greater than 0\n");
+					return 1;
+				}
+				break;
+			case 'o':
+				// o for origin
+				CONFIG.centered = !CONFIG.centered;
+				break;
+			case '?':
+				fprintf(stderr, "unrecognized option or missing option argument\n");
+				return 1;
+				break;
+			default:
+				fprintf(stderr, "unexpected getopt result: %c\n", optopt);
+				return 1;
+				break;
+		}
+	}
+	
+	printf("optind: %d, argc: %d\n", optind, argc);
+	
+	if (argc - optind != 3) {
+		fprintf(stderr, "expected three args; see usage\n");
+		return 1;
+	}
+	
+	CONFIG.img_west = argv[optind];
+	CONFIG.img_east = argv[optind + 1];
+	CONFIG.stl_base = argv[optind + 2];
+	
+	return 0;
+}
+
 
 int main(int argc, char **argv) {
+	
+	if (parseopts(argc, argv) != 0) {
+		return 1;
+	}
 	
 	if (MergeImages() != 0) {
 		return 1;
