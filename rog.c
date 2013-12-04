@@ -119,7 +119,7 @@ void off_a(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	// stem cavity
 	q(6, 10, 13, 9);
 	q(25, 9, 13, 23);
-	q(25, 13, 12, 8);
+	q(25, 23, 12, 8);
 	q(8, 12, 11, 7);
 	q(24, 7, 11, 22);
 	q(24, 22, 10, 6);
