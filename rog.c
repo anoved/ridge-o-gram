@@ -9,13 +9,14 @@
 typedef struct {
 	char *img_west; // path to "west" input image
 	char *img_east; // path to "east" input image
-	char *stl_base; // base output path (on/off suffixes will be appended)
+	char *stl_base; // base output path (white/black suffixes will be appended)
 	float xy_scale; // factor applied to x/y coordinates
 	int centered; // boolean; if false, southwest corner output at 0,0
-	float onbase_h; // height of "on" base layer
-	float offbase_h; // height of "off" base layer
-	float ridge_h; // height of ridge layer
+	float onbase_h; // height of white (lower) layer
+	float offbase_h; // height of black (middle) layer
+	float ridge_h; // height of ridge (upper) layer
 	int threshold; // pixel brightness > threshold considered white
+	int ascii; // boolean; if true, output ascii stl instead of binary
 } Settings;
 
 Settings CONFIG = {
@@ -27,7 +28,8 @@ Settings CONFIG = {
 	0.25,
 	0.25,
 	0.5,
-	155
+	155,
+	0
 };
 
 typedef struct {
@@ -342,30 +344,30 @@ void off_d(trix_mesh *mesh, trix_vertex *v, int *caps) {
 	}
 }
 
-void BaseWalls(trix_mesh *mOn, trix_mesh *mOff, trix_vertex *v, int x, int y, int w, int h) {
+void BaseWalls(trix_mesh *mwhite, trix_mesh *mblack, trix_vertex *v, int x, int y, int w, int h) {
 	
 	// west
 	if (x == 0) {
-		quad(mOn, &v[17], &v[21], &v[18], &v[14]);
-		quad(mOff, &v[0], &v[17], &v[14], &v[1]);
+		quad(mwhite, &v[17], &v[21], &v[18], &v[14]);
+		quad(mblack, &v[0], &v[17], &v[14], &v[1]);
 	}
 	
 	// east
 	if (x + 1 == w) {
-		quad(mOn, &v[15], &v[19], &v[20], &v[16]);
-		quad(mOff, &v[4], &v[15], &v[16], &v[5]);
+		quad(mwhite, &v[15], &v[19], &v[20], &v[16]);
+		quad(mblack, &v[4], &v[15], &v[16], &v[5]);
 	}
 	
 	// north
 	if (y == 0) {
-		quad(mOn, &v[17], &v[16], &v[20], &v[21]);
-		quad(mOff, &v[0], &v[5], &v[16], &v[17]);
+		quad(mwhite, &v[17], &v[16], &v[20], &v[21]);
+		quad(mblack, &v[0], &v[5], &v[16], &v[17]);
 	}
 	
 	// south
 	if (y + 1 == h) {
-		quad(mOn, &v[14], &v[18], &v[19], &v[15]);
-		quad(mOff, &v[1], &v[14], &v[15], &v[4]);
+		quad(mwhite, &v[14], &v[18], &v[19], &v[15]);
+		quad(mblack, &v[1], &v[14], &v[15], &v[4]);
 	}
 }
 
@@ -503,11 +505,11 @@ void updateVertices(trix_vertex *v, float x, float y) {
 int MergeImages(void) {
 	
 	bitmap bWest, bEast;
-	trix_mesh *mOn, *mOff;
+	trix_mesh *mwhite, *mblack;
 	int depth;
 	unsigned long offset;
 	int w, h, x, y;
-	int onWest, onEast;
+	int whiteWest, whiteEast;
 	float fx, fy;
 	// booleans indicating whether the north/south sides of east/west ridges need to be capped
 	int caps[4];
@@ -533,10 +535,10 @@ int MergeImages(void) {
 	w = bWest.w;
 	h = bWest.h;
 	
-	if (trixCreate(&mOn, "onpixels") != TRIX_OK) {
+	if (trixCreate(&mwhite, "onpixels") != TRIX_OK) {
 		return 1;
 	}
-	if (trixCreate(&mOff, "offpixels") != TRIX_OK) {
+	if (trixCreate(&mblack, "offpixels") != TRIX_OK) {
 		return 1;
 	}
 	
@@ -553,21 +555,21 @@ int MergeImages(void) {
 			
 			updateVertices(v, fx, fy);
 			
-			BaseWalls(mOn, mOff, v, x, y, w, h);
+			BaseWalls(mwhite, mblack, v, x, y, w, h);
 			
 			
 			offset = (y * w) + x;
 			
 			if (bWest.data[offset] > CONFIG.threshold) {
-				onWest = 1;
+				whiteWest = 1;
 			} else {
-				onWest = 0;
+				whiteWest = 0;
 			}
 			
 			if (bEast.data[offset] > CONFIG.threshold) {
-				onEast = 1;
+				whiteEast = 1;
 			} else {
-				onEast = 0;
+				whiteEast = 0;
 			}
 			
 			// nw, ne, sw, se; no caps by default
@@ -583,12 +585,12 @@ int MergeImages(void) {
 				offset = ((y - 1) * w) + x;
 				
 				// nw
-				if (onWest != (bWest.data[offset] > CONFIG.threshold)) {
+				if (whiteWest != (bWest.data[offset] > CONFIG.threshold)) {
 					caps[0] = 1;
 				}
 				
 				// ne
-				if (onEast != (bEast.data[offset] > CONFIG.threshold)) {
+				if (whiteEast != (bEast.data[offset] > CONFIG.threshold)) {
 					caps[1] = 1;
 				}
 			}
@@ -603,35 +605,31 @@ int MergeImages(void) {
 				offset = ((y + 1) * w) + x;
 				
 				// sw
-				if (onWest != (bWest.data[offset] > CONFIG.threshold)) {
+				if (whiteWest != (bWest.data[offset] > CONFIG.threshold)) {
 					caps[2] = 1;
 				}
 				
 				// se
-				if (onEast != (bEast.data[offset] > CONFIG.threshold)) {
+				if (whiteEast != (bEast.data[offset] > CONFIG.threshold)) {
 					caps[3] = 1;
 				}
 			}
 			
-			if (onWest && onEast) {
-				// both on
-				on_a(mOn, v, caps);
-				off_a(mOff, v, caps);
+			if (whiteWest && whiteEast) {
+				on_a(mwhite, v, caps);
+				off_a(mblack, v, caps);
 			}
-			else if (!onWest && !onEast) {
-				// both off
-				on_b(mOn, v, caps);
-				off_b(mOff, v, caps);
+			else if (!whiteWest && !whiteEast) {
+				on_b(mwhite, v, caps);
+				off_b(mblack, v, caps);
 			}
-			else if (onWest && !onEast) {
-				// west on, east off
-				on_c(mOn, v, caps);
-				off_c(mOff, v, caps);
+			else if (whiteWest && !whiteEast) {
+				on_c(mwhite, v, caps);
+				off_c(mblack, v, caps);
 			}
-			else if (!onWest && onEast) {
-				// west off, east on
-				on_d(mOn, v, caps);
-				off_d(mOff, v, caps);
+			else if (!whiteWest && whiteEast) {
+				on_d(mwhite, v, caps);
+				off_d(mblack, v, caps);
 			}
 		}
 	}
@@ -645,16 +643,16 @@ int MergeImages(void) {
 	strcpy(stl_black, CONFIG.stl_base);
 	strcat(stl_black, "-black.stl");
 	
-	trixWrite(mOn, stl_white, TRIX_STL_BINARY);
-	trixWrite(mOff, stl_black, TRIX_STL_BINARY);
+	trixWrite(mwhite, stl_white, CONFIG.ascii ? TRIX_STL_ASCII : TRIX_STL_BINARY);
+	trixWrite(mblack, stl_black, CONFIG.ascii ? TRIX_STL_ASCII : TRIX_STL_BINARY);
 	
 	// cleanup
 	
 	free(stl_white);
 	free(stl_black);
 	
-	trixRelease(&mOn);
-	trixRelease(&mOff);
+	trixRelease(&mwhite);
+	trixRelease(&mblack);
 	
 	stbi_image_free(bWest.data);
 	stbi_image_free(bEast.data);
@@ -667,7 +665,7 @@ int parseopts(int argc, char **argv) {
 	int c;
 	opterr = 0;
 	
-	while ((c = getopt(argc, argv, "a:b:c:s:t:o")) != -1) {
+	while ((c = getopt(argc, argv, "a:b:c:s:t:fo")) != -1) {
 		switch (c) {
 			case 'a':
 				// a for first of a b c layer thickness
@@ -703,6 +701,10 @@ int parseopts(int argc, char **argv) {
 					fprintf(stderr, "-t must be a number in range 0 to 255\n");
 					return 1;
 				}
+				break;
+			case 'f':
+				// f for format
+				CONFIG.ascii = !CONFIG.ascii;
 				break;
 			case 'o':
 				// o for origin
