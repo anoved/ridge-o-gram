@@ -360,14 +360,23 @@ void BaseWalls(trix_mesh *mwhite, trix_mesh *mblack, trix_vertex *v, int x, int 
 	
 	// north
 	if (y == 0) {
-		quad(mwhite, &v[17], &v[16], &v[20], &v[21]);
-		quad(mblack, &v[0], &v[5], &v[16], &v[17]);
+		
+		tri(mwhite, &v[0], &v[27], &v[17]);
+		tri(mwhite, &v[27], &v[16], &v[17]);
+		tri(mwhite, &v[5], &v[16], &v[27]);
+		
+		quad(mblack, &v[0], &v[27], &v[29], &v[17]);
+		quad(mblack, &v[27], &v[5], &v[16], &v[29]);
 	}
 	
 	// south
 	if (y + 1 == h) {
-		quad(mwhite, &v[14], &v[18], &v[19], &v[15]);
-		quad(mblack, &v[1], &v[14], &v[15], &v[4]);
+		tri(mwhite, &v[14], &v[18], &v[28]);
+		tri(mwhite, &v[28], &v[14], &v[15]);
+		tri(mwhite, &v[15], &v[28], &v[19]);
+		
+		quad(mblack, &v[1], &v[14], &v[28], &v[26]);
+		quad(mblack, &v[28], &v[15], &v[4], &v[26]);
 	}
 }
 
