@@ -4,14 +4,20 @@
 #include "stb_image.h"
 
 typedef struct {
-	float xy_scale;
-	int centered;
+	char *img_west; // path to "west" input image
+	char *img_east; // path to "east" input image
+	char *stl_base; // base output path (on/off suffixes will be appended)
+	float xy_scale; // factor applied to x/y coordinates
+	int centered; // boolean; if false, southwest corner output at 0,0
 	float onbase_h; // height of "on" base layer
 	float offbase_h; // height of "off" base layer
 	float ridge_h; // height of ridge layer
 } Settings;
 
 Settings CONFIG = {
+	NULL,
+	NULL,
+	NULL,
 	1.0,
 	1,
 	0.25,
