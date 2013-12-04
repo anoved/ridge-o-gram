@@ -15,6 +15,7 @@ typedef struct {
 	float onbase_h; // height of "on" base layer
 	float offbase_h; // height of "off" base layer
 	float ridge_h; // height of ridge layer
+	int threshold; // pixel brightness > threshold considered white
 } Settings;
 
 Settings CONFIG = {
@@ -25,15 +26,14 @@ Settings CONFIG = {
 	1,
 	0.25,
 	0.25,
-	0.5
+	0.5,
+	155
 };
 
 typedef struct {
 	int w, h;
 	unsigned char *data;
 } bitmap;
-
-unsigned char threshold = 155;
 
 // vertices a, b, c and d should appear in counter-clockwise order as seen from outside the quad.
 // rendered as two triangles, abd and bcd.
@@ -558,13 +558,13 @@ int MergeImages(void) {
 			
 			offset = (y * w) + x;
 			
-			if (bWest.data[offset] > threshold) {
+			if (bWest.data[offset] > CONFIG.threshold) {
 				onWest = 1;
 			} else {
 				onWest = 0;
 			}
 			
-			if (bEast.data[offset] > threshold) {
+			if (bEast.data[offset] > CONFIG.threshold) {
 				onEast = 1;
 			} else {
 				onEast = 0;
@@ -583,12 +583,12 @@ int MergeImages(void) {
 				offset = ((y - 1) * w) + x;
 				
 				// nw
-				if (onWest != (bWest.data[offset] > threshold)) {
+				if (onWest != (bWest.data[offset] > CONFIG.threshold)) {
 					caps[0] = 1;
 				}
 				
 				// ne
-				if (onEast != (bEast.data[offset] > threshold)) {
+				if (onEast != (bEast.data[offset] > CONFIG.threshold)) {
 					caps[1] = 1;
 				}
 			}
@@ -603,12 +603,12 @@ int MergeImages(void) {
 				offset = ((y + 1) * w) + x;
 				
 				// sw
-				if (onWest != (bWest.data[offset] > threshold)) {
+				if (onWest != (bWest.data[offset] > CONFIG.threshold)) {
 					caps[2] = 1;
 				}
 				
 				// se
-				if (onEast != (bEast.data[offset] > threshold)) {
+				if (onEast != (bEast.data[offset] > CONFIG.threshold)) {
 					caps[3] = 1;
 				}
 			}
@@ -667,7 +667,7 @@ int parseopts(int argc, char **argv) {
 	int c;
 	opterr = 0;
 	
-	while ((c = getopt(argc, argv, "a:b:c:s:o")) != -1) {
+	while ((c = getopt(argc, argv, "a:b:c:s:t:o")) != -1) {
 		switch (c) {
 			case 'a':
 				// a for first of a b c layer thickness
@@ -694,6 +694,13 @@ int parseopts(int argc, char **argv) {
 				// s for scale
 				if (sscanf(optarg, "%10f", &CONFIG.xy_scale) != 1 || CONFIG.xy_scale <= 0) {
 					fprintf(stderr, "-s must be a number greater than 0\n");
+					return 1;
+				}
+				break;
+			case 't':
+				// t for threshold
+				if (sscanf(optarg, "%10d", &CONFIG.threshold) != 1 || CONFIG.threshold < 0 || CONFIG.threshold > 255) {
+					fprintf(stderr, "-t must be a number in range 0 to 255\n");
 					return 1;
 				}
 				break;
