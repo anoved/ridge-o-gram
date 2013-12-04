@@ -718,9 +718,7 @@ int parseopts(int argc, char **argv) {
 				break;
 		}
 	}
-	
-	printf("optind: %d, argc: %d\n", optind, argc);
-	
+		
 	if (argc - optind != 3) {
 		fprintf(stderr, "expected three args; see usage\n");
 		return 1;
