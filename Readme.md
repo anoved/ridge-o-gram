@@ -32,6 +32,19 @@ Here is the output of `rog -h`:
 	-o           (off)  Locate origin at bottom left of image instead of center.
 	-h           (off)  Display this help message and quit.
 
+# Examples
+
+The `examples` folder contains two test cases, `tiny` and `face`.
+The STL files were produced with the default options. For example:
+
+	./rog examples/face-left.jpg examples/face-right.jpg examples/face
+
+The above command produces `examples/face-white.stl` and `examples/face-black.stl`,
+which together form the ridged surface displayed from different angles in this
+composite image:
+
+![example ridge-o-gram output](examples/face-example.png)
+
 # Acknowledgements
 
 Images are loaded using Sean Barrett's public domain [stb_image.c](http://nothings.org/stb_image.c) library.
