@@ -538,7 +538,7 @@ int MergeImages(void) {
 	
 	// validate that dimensions match
 	if (bWest.w != bEast.w || bWest.h != bEast.h) {
-		fprintf(stderr, "image dimensions do not match\n");
+		fprintf(stderr, "Image dimensions do not match.\n");
 		return 1;
 	}
 	w = bWest.w;
@@ -669,12 +669,36 @@ int MergeImages(void) {
 	return 0;
 }
 
+void PrintUsage(const char *prog) {
+	printf("Usage: %s [OPTIONS] LEFT RIGHT OUTPUT\n", prog);
+	printf("\n");
+	printf("The LEFT and RIGHT arguments specify the paths to the input images, which\n");
+	printf("must have the same dimensions. Grayscale images will be interpreted as black\n");
+	printf("and white according to the -t option. Color images will be read as grayscale\n");
+	printf("images according to an intermediate luminance conversion (0.3R 0.59G 0.11B).\n");
+	printf("Supported image formats include PNG, GIF, and [non-progressive] JPG.\n");
+	printf("\n");
+	printf("The OUTPUT argument specifies the base output path; output will consist of\n");
+	printf("two STL files, named OUTPUT-white.stl and OUTPUT-black.stl.\n");
+	printf("\n");
+	printf("OPTIONS (CURRENT):\n");
+	printf("\n");
+	printf("-a THICKNESS (%.2f) Bottom layer (white base) thickness.\n", CONFIG.h_white);
+	printf("-b THICKNESS (%.2f) Middle layer (black base) thickness.\n", CONFIG.h_black);
+	printf("-c THICKNESS (%.2f) Top layer (image ridges) thickness.\n", CONFIG.h_ridge);
+	printf("-s SCALE     (%.2f) Scaling factor applied to x/y coordinates.\n", CONFIG.xy_scale);
+	printf("-t THRESHOLD (%3d)  Brightness values > THRESHOLD considered white.\n", CONFIG.threshold);
+	printf("-f           (%s)  Output ASCII format STL instead of binary.\n", CONFIG.ascii ? " on" : "off");
+	printf("-o           (%s)  Locate origin at bottom left of image instead of center.\n", CONFIG.centered ? "off" : " on");
+	printf("-h           (off)  Display this help message and quit.\n");
+}
+
 // returns 0 on success
 int parseopts(int argc, char **argv) {
 	int c;
 	opterr = 0;
 	
-	while ((c = getopt(argc, argv, "a:b:c:s:t:fo")) != -1) {
+	while ((c = getopt(argc, argv, "a:b:c:s:t:foh")) != -1) {
 		switch (c) {
 			case 'a':
 				// a for first of a b c layer thickness
@@ -719,19 +743,23 @@ int parseopts(int argc, char **argv) {
 				// o for origin
 				CONFIG.centered = !CONFIG.centered;
 				break;
+			case 'h':
+				PrintUsage(argv[0]);
+				exit(0);
+				break;
 			case '?':
-				fprintf(stderr, "unrecognized option or missing option argument\n");
+				fprintf(stderr, "Unrecognized option or missing option argument.\n");
 				return 1;
 				break;
 			default:
-				fprintf(stderr, "unexpected getopt result: %c\n", optopt);
+				fprintf(stderr, "Unexpected trouble parsing options. (%c)\n", optopt);
 				return 1;
 				break;
 		}
 	}
 		
 	if (argc - optind != 3) {
-		fprintf(stderr, "expected three args; see usage\n");
+		fprintf(stderr, "Did not find expected number of arguments.\n");
 		return 1;
 	}
 	
@@ -742,10 +770,10 @@ int parseopts(int argc, char **argv) {
 	return 0;
 }
 
-
 int main(int argc, char **argv) {
 	
 	if (parseopts(argc, argv) != 0) {
+		fprintf(stderr, "Try the -h option for usage help.\n");
 		return 1;
 	}
 	
